@@ -55,12 +55,19 @@ export class Scaffold implements IScaffold {
 			const AvailableTemplates: Template = new Template();
 			switch (this.FileInfo.Extension) {
 				case '.js':
-					if (this.Scaffolding.Javascript) {
+					if (this.Scaffolding.Global && this.Scaffolding.Javascript) {
 						this.Text = AvailableTemplates.JavascriptBoilerplate();
 					}
 					break;
 
 				case '.ts':
+					if (this.Scaffolding.Global && this.Scaffolding.Javascript) {
+						this.Text = AvailableTemplates.TypescriptBoilerplate(
+							this.FileInfo.Name.replace('.ts', ''),
+							0,
+							Helper.Configuration('typescriptBoilerplateStyle'),
+						);
+					}
 					break;
 
 				case '.css':
@@ -76,23 +83,58 @@ export class Scaffold implements IScaffold {
 						this.Text = AvailableTemplates.HTML();
 					}
 					// Validate and add js template
-					if (this.Scaffolding.Javascript && (!this.Splitting.Enabled || !this.Splitting.Javascript)) {
-						this.Text += AvailableTemplates.Javascript(1, this.Boilerplate.Global && this.Boilerplate.Javascript);
-					} else if (this.Splitting.Enabled && this.Splitting.Javascript) {
-						this.Text += AvailableTemplates.JavascriptReference(
-							this.FileInfo.Name.replace('.vue', Helper.Configuration('javascriptSplittingExtension')),
-							1,
-						);
-					}
+					this.ConfigureScriptForVue(AvailableTemplates);
 					// Validate and add css template
-					if (this.Scaffolding.Css && (!this.Splitting.Enabled || !this.Splitting.Css)) {
-						this.Text += AvailableTemplates.Css(1);
-					} else if (this.Splitting.Enabled && this.Splitting.Css) {
-						this.Text += AvailableTemplates.CssReference(this.FileInfo.Name.replace('.vue', Helper.Configuration('cssSplittingExtension')), 1);
-					}
+					this.ConfigureStyleForVue(AvailableTemplates);
 					break;
 			}
 			this.Text = Helper.TrimExtraBlankLines(this.Text);
+		} catch (Error) {
+			console.error(Error.toString());
+		}
+	}
+
+	private ConfigureScriptForVue(AvailableTemplates: Template): void {
+		try {
+			switch (Helper.Configuration('javascriptSplittingExtension')) {
+				default:
+				case '.js':
+					if (this.Scaffolding.Javascript && (!this.Splitting.Enabled || !this.Splitting.Javascript)) {
+						this.Text += AvailableTemplates.Javascript(1, this.Boilerplate.Global && this.Boilerplate.Javascript);
+					} else if (this.Splitting.Enabled && this.Splitting.Javascript) {
+						this.Text += AvailableTemplates.JavascriptReference(this.FileInfo.Name.replace('.vue', ''), 1);
+					}
+					break;
+				case '.ts':
+					const Style = Helper.Configuration('typescriptBoilerplateStyle');
+					const FileName: string = this.FileInfo.Name.replace('.vue', '');
+					const FileNameWithExtension: string = this.FileInfo.Name.replace('.vue', '.ts');
+					if (this.Scaffolding.Javascript && (!this.Splitting.Enabled || !this.Splitting.Javascript)) {
+						if (this.Boilerplate.Global && this.Boilerplate.Javascript) {
+							this.Text += AvailableTemplates.Typescript(1);
+						} else {
+							const Boilerplate: string = AvailableTemplates.TypescriptBoilerplate(FileName, 0, Style);
+							this.Text += AvailableTemplates.TypescriptBoilerplate(FileName, 1, Boilerplate);
+						}
+					} else if (this.Splitting.Enabled && this.Splitting.Javascript) {
+						this.Text += AvailableTemplates.TypescriptReference(FileNameWithExtension, 1);
+					}
+					break;
+			}
+		} catch (Error) {
+			console.error(Error.toString());
+		}
+	}
+	private ConfigureStyleForVue(AvailableTemplates: Template): void {
+		try {
+			if (this.Scaffolding.Css && (!this.Splitting.Enabled || !this.Splitting.Css)) {
+				// For no external css
+				this.Text += AvailableTemplates.Css(1);
+			} else if (this.Splitting.Enabled && this.Splitting.Css) {
+				// For external css
+				const Extension = Helper.Configuration('cssSplittingExtension');
+				this.Text += AvailableTemplates.CssReference(this.FileInfo.Name.replace('.vue', Extension), 1);
+			}
 		} catch (Error) {
 			console.error(Error.toString());
 		}

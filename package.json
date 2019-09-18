@@ -133,6 +133,21 @@
 						"default": true,
 						"description": "Add basic javascript boilerplate during scaffolding.",
 						"scope": "window"
+					},
+					"vueAsst.typescriptBoilerplateStyle": {
+						"type": "string",
+						"enum": [
+							"Default",
+							"Class",
+							"Decorator"
+						],
+						"enumDescriptions": [
+							"Use default style as written in the docs.",
+							"Use vue-class-component style.",
+							"Use vue-property-decorator style."
+						],
+						"default": "Default",
+						"scope": "window"
 					}
 				}
 			}

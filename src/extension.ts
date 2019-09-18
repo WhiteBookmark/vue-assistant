@@ -1,30 +1,17 @@
-import * as vscode from 'vscode';
-import File from './Scripts/File';
-import { URI } from 'vscode-uri';
+import { ExtensionContext, workspace } from 'vscode';
+import { Command } from './Scripts/Command';
 
-export async function activate(context: vscode.ExtensionContext) {
-	const documentSelector: vscode.DocumentSelector = {
-		language: 'vue',
-		scheme: 'file',
-	};
+export async function activate(context: ExtensionContext) {
+	try {
+		const CommandsList = new Command();
+		const NewFileCommand = await CommandsList.CreateNewFile();
 
-	const EchoHellowWorld = vscode.commands.registerCommand('extension.helloWorld', async () => {
-		vscode.window.showInformationMessage('Hello VS Code');
-		File.CreateNew();
-
-		const Folders = vscode.workspace.workspaceFolders;
-		if (!Folders) {
-			return;
+		if (NewFileCommand) {
+			context.subscriptions.push(NewFileCommand);
 		}
-		Folders.forEach(async (element) => {
-			const ReadDir = await vscode.workspace.fs.readDirectory(URI.file(element.uri.fsPath));
-			ReadDir!.forEach((Dir) => {
-				console.log(Dir[0]);
-			});
-		});
-	});
-
-	context.subscriptions.push(EchoHellowWorld);
+	} catch (Error) {
+		console.error(Error.toString());
+	}
 }
 
 export function deactivate() {}

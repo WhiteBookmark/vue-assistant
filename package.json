@@ -1,9 +1,18 @@
 {
-	"name": "vue-splitter",
-	"displayName": "Vue Splitter",
+	"name": "vue-assistant",
+	"displayName": "Vue Assistant",
 	"description": "Extension with the primary focus to aid in Vue development projects.",
+	"author": "Suleman Khan",
+	"publisher": "WhiteBookmark",
 	"version": "0.0.1",
-	"repository": "https://github.com/WhiteBookmark/vue-splitter",
+	"homepage": "https://github.com/WhiteBookmark/vue-assistant/blob/master/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WhiteBookmark/vue-assistant"
+	},
+	"bugs": {
+		"url": "https://github.com/WhiteBookmark/vue-assistant/issues"
+	},
 	"license": "MIT",
 	"engines": {
 		"vscode": "^1.38.0"
@@ -11,23 +20,137 @@
 	"categories": [
 		"Other"
 	],
+	"keywords": [
+		"vue",
+		"split",
+		"file",
+		"create",
+		"new"
+	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": [
+			{
+				"title": "Vue Assistant",
+				"properties": {
+					"vueAsst.enableNewFileCreation": {
+						"type": "boolean",
+						"default": true,
+						"description": "Creation of new Vue files via explorer or command palette.",
+						"scope": "window"
+					},
+					"vueAsst.enableFileOverwriting": {
+						"type": "boolean",
+						"default": false,
+						"description": "Overwrite the files with same name if they already exist in the selected directory.",
+						"scope": "window"
+					},
+					"vueAsst.enableFileSplittingForNewFiles": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enable splitting of new Vue file into separate html/javascript/css files according to the preferred settings.",
+						"scope": "window"
+					},
+					"vueAsst.enableCssSplitting": {
+						"type": "boolean",
+						"default": true,
+						"description": "Split new Vue file's css into a separate file.",
+						"scope": "window"
+					},
+					"vueAsst.enableJavascriptSplitting": {
+						"type": "boolean",
+						"default": true,
+						"description": "Split new Vue file's javascript into a separate file.",
+						"scope": "window"
+					},
+					"vueAsst.javascriptSplittingExtension": {
+						"type": "string",
+						"enum": [
+							".js",
+							".ts"
+						],
+						"enumDescriptions": [
+							"Split javascript code into a .js file",
+							"Split into a .ts file instead of .js"
+						],
+						"default": ".js",
+						"description": "Javascript splitting extension.",
+						"scope": "window"
+					},
+					"vueAsst.cssSplittingExtension": {
+						"type": "string",
+						"enum": [
+							".css",
+							".scss",
+							".sass",
+							".less"
+						],
+						"enumDescriptions": [
+							"Split css into a .css file",
+							"Split into a .scss file instead of .css",
+							"Split into a .sass file instead of .css",
+							"Split into a .less file instead of .css"
+						],
+						"default": ".css",
+						"description": "Css splitting extension.",
+						"scope": "window"
+					},
+					"vueAsst.enableScaffolding": {
+						"type": "boolean",
+						"default": true,
+						"description": "Scaffold new Vue files upon creation.",
+						"scope": "window"
+					},
+					"vueAsst.enableHtmlScaffolding": {
+						"type": "boolean",
+						"default": true,
+						"description": "Scaffold HTML for new Vue files upon creation.",
+						"scope": "window"
+					},
+					"vueAsst.enableJavascriptScaffolding": {
+						"type": "boolean",
+						"default": true,
+						"description": "Scaffold javascript for new Vue files upon creation.",
+						"scope": "window"
+					},
+					"vueAsst.enableCssScaffolding": {
+						"type": "boolean",
+						"default": true,
+						"description": "Scaffold css for new Vue files upon creation.",
+						"scope": "window"
+					},
+					"vueAsst.enableBoilerplate": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enable the addition of boilerplate during scaffolding.",
+						"scope": "window"
+					},
+					"vueAsst.addJavascriptBoilerplate": {
+						"type": "boolean",
+						"default": true,
+						"description": "Add basic javascript boilerplate during scaffolding.",
+						"scope": "window"
+					}
+				}
+			}
+		],
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello VS Code World"
+				"when": "explorerResourceIsFolder",
+				"command": "vueAsst.createNewFile",
+				"title": "New Vue file",
+				"group": "File"
 			}
 		],
 		"menus": {
 			"explorer/context": [
 				{
-					"when": "resourceLangId == javascript",
-					"command": "extension.helloWorld",
-					"group": "YourGroup@1"
+					"when": "explorerResourceIsFolder",
+					"command": "vueAsst.createNewFile",
+					"group": "File"
 				}
 			]
 		}
@@ -40,6 +163,7 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
+		"@types/fs-extra": "^8.0.0",
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^5.2.7",
 		"@types/node": "^12.7.5",
@@ -48,7 +172,10 @@
 		"mocha": "^6.2.0",
 		"tslint": "^5.20.0",
 		"typescript": "^3.6.3",
-		"vscode-test": "^1.2.0",
+		"vscode-test": "^1.2.0"
+	},
+	"dependencies": {
+		"fs-extra": "^8.1.0",
 		"vscode-uri": "^2.0.3"
 	}
 }
